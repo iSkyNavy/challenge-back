@@ -50,12 +50,6 @@ trait HasResponse
 
         return response()->json($structure, $code);
     }
-    public function customizeMessage($message, $code = JsonResponse::HTTP_OK)
-    {
-        $structure = $this->defaultStructure($code, $message);
-
-        return response()->json($structure, $code);
-    }
 
     /**
      * @param $errors
@@ -65,11 +59,11 @@ trait HasResponse
      */
     public function errorResponse($errors, $message, $code)
     {
-        $errorsIsArray = is_array($errors);
+        $errors_is_array = is_array($errors);
         $success = false;
 
         $structure = $this->defaultStructure($code, $message, $success);
-        $structure['errors'] = !$errorsIsArray || ($errorsIsArray && count($errors) > 0) ? $errors : null;
+        $structure['errors'] = !$errors_is_array || ($errors_is_array && count($errors) > 0) ? $errors : null;
 
         return response()->json($structure, $code);
     }

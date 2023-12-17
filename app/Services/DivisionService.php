@@ -15,36 +15,28 @@ class DivisionService
 
     public function getDivisions(array $params, $withPagination = true)
     {
-        try {
-            $query = Division::with('divisionSuperior')->withCount(['collaborators', 'subDivisions']);
-            return $withPagination
-                ? $query->paginate((int) ($params['per_page'] ?? 10))
-                : $query->get();
-        } catch (\Throwable $th) {
-            return response()->json($th->getMessage(), 500);
-        };
+        $query = Division::with('divisionSuperior')->withCount(['collaborators', 'subDivisions']);
+        return $withPagination
+            ? $query->paginate((int) ($params['per_page'] ?? 10))
+            : $query->get();
     }
 
     public function createDivision(array $params)
     {
-        try {
-            $values = [];
-            if (isset($params['name'])) {
-                $values['name'] = $params["name"];
-            };
-            if (isset($params['level'])) {
-                $values['level'] = $params["level"];
-            };
-            if (isset($params['ambassador_name'])) {
-                $values['ambassador_name'] = $params["ambassador_name"];
-            };
-            if (isset($params['division_superior_id'])) {
-                $values['division_superior_id'] = $params["division_superior_id"];
-            };
-            return Division::create($values);
-        } catch (\Throwable $th) {
-            return response()->json($th->getMessage(), 500);
-        }
+        $values = [];
+        if (isset($params['name'])) {
+            $values['name'] = $params["name"];
+        };
+        if (isset($params['level'])) {
+            $values['level'] = $params["level"];
+        };
+        if (isset($params['ambassador_name'])) {
+            $values['ambassador_name'] = $params["ambassador_name"];
+        };
+        if (isset($params['division_superior_id'])) {
+            $values['division_superior_id'] = $params["division_superior_id"];
+        };
+        return Division::create($values);
     }
 
     public function showDivision(int $id)
