@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\DivisionAllowedRule;
+use App\Rules\DivisionSuperiorNotDivision;
+use App\Rules\DivisionSuperiorNotDivisionRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
 class UpdateDivisionRequest extends FormRequest
 {
@@ -22,7 +26,9 @@ class UpdateDivisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'string|max:45|unique:divisions,name,' . $this->route('id'),
+            'ambassador_name' => ['string', 'nullable'],
+            'division_superior_id' => ['integer', 'nullable', new DivisionAllowedRule(), new DivisionSuperiorNotDivisionRule($this->route('id'))]
         ];
     }
 }

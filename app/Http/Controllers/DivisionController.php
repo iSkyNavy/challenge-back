@@ -6,15 +6,22 @@ use App\Models\Division;
 use App\Http\Requests\StoreDivisionRequest;
 use App\Http\Requests\UpdateDivisionRequest;
 use App\Http\Resources\DivisionResource;
+use App\Services\DivisionService;
+use Illuminate\Http\Request;
 
 class DivisionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+
+    public function __construct(private DivisionService $divisionService)
     {
-        $divisions = Division::with('divisionSuperior')->withCount(['collaborators', 'subDivisions'])->get();
+    }
+    public function index(Request $request)
+    {
+        $withPagination = $request->hasAny(['per_page', 'page']);
+        $divisions = $this->divisionService->getDivisions($request->all(), $withPagination);
         return DivisionResource::collection($divisions)->additional($this->defaultStructure());
     }
 
@@ -31,11 +38,8 @@ class DivisionController extends Controller
      */
     public function store(StoreDivisionRequest $request)
     {
-        return Division::create([
-            'name' => $request->name,
-            'level' => $request->level,
-            'ambassador_name' => $request->ambassador_name,
-        ]);
+        $division = $this->divisionService->createDivision($request->all());
+        return DivisionResource::make($division)->additional($this->defaultStructure());
     }
 
     /**
@@ -43,7 +47,9 @@ class DivisionController extends Controller
      */
     public function show(int $id)
     {
-        return Division::findOrFail($id);
+        $division = $this->divisionService->showDivision($id);
+        $division->load('subDivisions');
+        return DivisionResource::make($division)->additional($this->defaultStructure());
     }
 
     /**
@@ -59,15 +65,8 @@ class DivisionController extends Controller
      */
     public function update(UpdateDivisionRequest $request, int $id)
     {
-        // $division = Division::where('id', $id)->first();
-        $division = Division::findOrFail($id);
-        $params = [];
-        $request->name ? $params['name'] = $request->name : '';
-        $request->level ? $params['level'] = $request->level : '';
-        $request->ambassador_name ? $params['ambassador_name'] = $request->ambassador_name : '';
-        $request->division_superior_id ? $params['division_superior_id'] = $request->division_superior_id : '';
-        $division->update($params);
-        return $division;
+        $division = $this->divisionService->updateDivision($request, $id);
+        return DivisionResource::make($division)->additional($this->defaultStructure());
     }
 
     /**
@@ -77,6 +76,6 @@ class DivisionController extends Controller
     {
         $division = Division::findOrFail($id);
         $division->delete();
-        return $division;
+        return DivisionResource::make($division)->additional($this->defaultStructure());
     }
 }

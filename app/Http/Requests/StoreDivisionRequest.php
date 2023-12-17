@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\DivisionAllowedRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDivisionRequest extends FormRequest
@@ -22,7 +23,9 @@ class StoreDivisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:45|unique:divisions,name,' . $this->route('id'),
+            'ambassador_name' => 'string',
+            'division_superior_id' => ['integer', new DivisionAllowedRule()]
         ];
     }
 }
