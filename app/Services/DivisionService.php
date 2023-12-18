@@ -15,10 +15,35 @@ class DivisionService
 
     public function getDivisions(array $params, $withPagination = true)
     {
-        $query = Division::with('divisionSuperior')->withCount(['collaborators', 'subDivisions']);
-        return $withPagination
-            ? $query->paginate((int) ($params['per_page'] ?? 10))
-            : $query->get();
+        try {
+            $query = Division::with('divisionSuperior')->withCount(['collaborators', 'subDivisions']);
+            if (isset($params['name'])) {
+                $query->whereIn('name', $params['name']);
+            };
+            if (isset($params['divisionSuperiorName'])) {
+                $query->whereHas('divisionSuperior', function ($query) use ($params) {
+                    $query->whereIn('name', $params['divisionSuperiorName']);
+                });
+            };
+            if (isset($params['sort'])) {
+                $sortParams = explode(",", $params['sort']);
+                $attr = $sortParams[0];
+                if ($attr === "collaboratorsCount") {
+                    $attr = "collaborators_count";
+                } else if ($attr === "level") {
+                    $attr = "level";
+                } else if ($attr === "subDivisionsCount") {
+                    $attr = "sub_divisions_count";
+                }
+                $direction = $sortParams[1];
+                $query->orderBy($attr, $direction);
+            };
+            return $withPagination
+                ? $query->paginate((int) ($params['per_page'] ?? 10))
+                : $query->get();
+        } catch (\Throwable $th) {
+            return response()->json($th->getMessage(), 500);
+        }
     }
 
     public function createDivision(array $params)

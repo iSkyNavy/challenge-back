@@ -25,6 +25,19 @@ class DivisionController extends Controller
         return DivisionResource::collection($divisions)->additional($this->defaultStructure());
     }
 
+    public function getNames()
+    {
+        $divisionsNames = Division::pluck('name')->toArray();
+        return response()->json(["data" => $divisionsNames, ...$this->defaultStructure()]);
+    }
+
+    public function getDivisionSuperiorNames()
+    {
+        $divisionsSuperiorNames = Division::where("division_superior_id", "<>", null)->with("divisionSuperior")->get()->unique("division_superior_id")->pluck('divisionSuperior.name')->toArray();
+        // return $divisionsSuperiorNames;
+        return response()->json(["data" => $divisionsSuperiorNames, ...$this->defaultStructure()]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

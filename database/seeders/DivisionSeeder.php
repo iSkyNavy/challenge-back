@@ -19,7 +19,7 @@ class DivisionSeeder extends Seeder
 
     protected function runDataFake()
     {
-        Division::factory()->count(29)->create();
+        Division::factory()->count(80)->create();
     }
 
     private function runDataDefault()

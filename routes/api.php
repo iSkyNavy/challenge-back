@@ -27,6 +27,8 @@ Route::get('/', function () {
 
 Route::controller(DivisionController::class)->prefix('division')->group(function () {
     Route::get('/', 'index');
+    Route::get('/names', 'getNames');
+    Route::get('/superior/names', 'getDivisionSuperiorNames');
     Route::get('/{id}', 'show');
     Route::post('/', 'store');
     Route::patch('/{id}', 'update');

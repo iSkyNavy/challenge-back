@@ -22,7 +22,7 @@ class DivisionFactory extends Factory
         $name = fake()->optional()->firstNameMale();
         $lastName = fake()->optional()->lastName();
         return [
-            'name' => fake()->unique()->name(),
+            'name' => fake()->unique()->userName(),
             'division_superior_id' => fake()->numberBetween(0, 3) === 0 ? null : Division::inRandomOrder()->first(),
             'level' => fake()->randomNumber(2),
             'ambassador_name' => $name ? $name . ' ' . $lastName : null
